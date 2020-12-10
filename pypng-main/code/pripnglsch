@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+# pripnglsch
+# PNG List Chunks
+
+import png
+
+
+def list_chunks(out, inp):
+    r = png.Reader(file=inp)
+    for t, v in r.chunks():
+        add = ""
+        if len(v) <= 28:
+            add = " " + v.hex()
+        else:
+            add = " " + v[:26].hex() + "..."
+        t = t.decode("ascii")
+        print("%s %10d%s" % (t, len(v), add), file=out)
+
+
+def main(argv=None):
+    import argparse
+    import sys
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("png", nargs="?", default="-")
+    args = parser.parse_args()
+    inp = png.cli_open(args.png)
+    return list_chunks(sys.stdout, inp)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,61 @@
+Release Procedure
+=================
+
+You'll need Docker. And twine.
+
+At top-level...
+
+Edit ``code/png.py`` for new version number.  Then ``git commit`` this.
+
+Get release notes into ``README.md`` somehow.
+
+Get the latest git change hash::
+
+    git log -n1 | sed q
+
+Set the PYPNG_VERSION variable (extracted from `code/png.py`):
+
+    . ./pypng-version
+
+Add a tag for this release (the tags have this format so that
+the automatically generated tarballs from github.com have the
+right URL).
+
+    git tag -a pypng-$PYPNG_VERSION -m "PyPNG release $PYPNG_VERSION"
+
+and push:
+
+    git push --tags origin HEAD
+
+Make a clean clone:
+
+    cd ${PWD%pypng*}
+    git clone pypng pypng-$PYPNG_VERSION
+    cd pypng-$PYPNG_VERSION
+
+Run the shell script that drives Docker:
+
+    sh dock.sh
+
+It's possible at this point that you might want to smoke-test the actual
+release binary.  Let's assume that the release binary is good to go.
+
+cd back into your main development directory::
+
+    cd ${PWD%pypng*}pypng
+
+Check that the `sh dock.sh` command populated
+the `dist/` directory in the original `pypng` directory.
+
+    ls dist
+
+Where does documentation go? (pythonhosted no longer host)
+
+Upload to PyPI:
+
+    twine upload dist/*.tar.gz
+
+(If it complains about "you must be identified" then use
+"python setup.py register" first)
+
+Make a record in ``release/index.txt``
